@@ -11,9 +11,7 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', 'Shop\HomePageController@index')->name('homepage');
 
 Route::group(['namespace' => 'Shop', 'prefix' => 'shop'], function () {
     Route::resource('orders', 'OrderController')->names('orders')->only(['index', 'edit', 'update']);
