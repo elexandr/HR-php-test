@@ -3,6 +3,8 @@
 namespace App\Repositories;
 
 use App\Order as Model;
+use Illuminate\Pagination\LengthAwarePaginator;
+use mysql_xdevapi\Collection;
 
 /**
  * Class ShopOrderRepository
@@ -19,6 +21,9 @@ class ShopOrderRepository extends CoreRepository
         return Model::class;
     }
 
+    /**
+     * @return LengthAwarePaginator
+     */
     public function getAllWithPaginate()
     {
         $columns = [
@@ -56,15 +61,16 @@ class ShopOrderRepository extends CoreRepository
     }
 
     /**
-     * Получить модeль для редкатирования в админке
+     * Получить модeль для редкатирования
      * @param $id
-     * @return mixed
+     * @return \Illuminate\Database\Eloquent\Collection
      */
-
 
     public function getEdit($id)
     {
-        return $this->startConditions()->find($id);
+        return $this->startConditions()
+            ->with(['partner:id,name', 'orderproduct', 'product'])
+            ->find($id);
     }
 
 }

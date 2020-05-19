@@ -20,8 +20,7 @@
 
             @foreach($orders as $order)
                 <tr>
-                    {{--<td href="{{ route("orders.edit", ['order' => $order->id]) }}>{{ $order->id }}</td>--}}
-                    <td> <a href="{{ route("orders.edit", ['order' => $order->id]) }}">{{ $order->id }}</a></td>
+                    <td> <a target="_blank" href="{{ route("orders.edit", ['order' => $order->id]) }}">{{ $order->id }}</a></td>
                     <td>{{ $order->partner->name }}</td>
                     <td>{{ $order->order_sum }}</td>
                     <td>{{ $order->products }}</td>
