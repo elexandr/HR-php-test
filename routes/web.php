@@ -14,3 +14,7 @@
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::group(['namespace' => 'Shop', 'prefix' => 'shop'], function () {
+    Route::resource('orders', 'OrderController')->names('orders')->only(['index', 'edit', 'update']);
+});
