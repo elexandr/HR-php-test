@@ -17,6 +17,7 @@
 	},
 	"require-dev": {
 		"barryvdh/laravel-debugbar": "^3.3",
+		"beyondcode/laravel-dump-server": "^1.4",
 		"filp/whoops": "~2.0",
 		"laravel/homestead": "^10.8",
 		"mockery/mockery": "0.9.*",

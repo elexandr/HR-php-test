@@ -11,14 +11,11 @@ use Illuminate\Support\Facades\DB;
 
 class OrderController extends BaseController
 {
-    /**
-     * @var \Illuminate\Foundation\Application
-     */
+
     private $shopOrderRepository;
 
     /**
-     * OrderCotroller conctructor
-     *
+     * OrderCotroller conctructor     *
      */
     public function __construct()
     {

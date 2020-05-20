@@ -30,17 +30,16 @@ class ShopOrderRepository extends CoreRepository
             'id',
             'status',
             'partner_id',
-            'delivery_dt',
         ];
 
         $result = $this->startConditions()
             ->select($columns)
             ->orderBy('id', 'DESC')
-            ->with(['partner:id,name', 'orderproduct', 'product'])
+            ->with([
+                'partner:id,name',
+                'orderproduct:id,order_id,product_id,quantity,price',
+                'product'])
             ->paginate(20);
-
-
-        //TODO: Посмотреть на предмет оптимизации
 
         $result->getCollection()->each(function ($item) {                         //Получаем сумму позиции
             $item->orderproduct->each(function ($item) {

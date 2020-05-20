@@ -8,6 +8,8 @@
         @yield('title', 'Laravel test')
     </title>
 
+@yield('csrf')
+
 {{--start custom css--}}
 @yield('custom_css')
 {{--end custom css--}}
@@ -78,7 +80,7 @@
 
 {{--start custom js--}}
 
-{{--@yield('custom_js')--}}
+@yield('custom_js')
 
 {{--end custom js--}}
 
