@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Order as Model;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Log;
 use mysql_xdevapi\Collection;
 
 /**
@@ -24,7 +25,45 @@ class ShopOrderRepository extends CoreRepository
     /**
      * @return LengthAwarePaginator
      */
-    public function getAllWithPaginate()
+    public function getAll()
+    {
+        $columns = [
+            'id',
+            'status',
+            'partner_id',
+            'delivery_dt',
+        ];
+
+        $result = $this->startConditions()
+            ->select($columns)
+            ->with([
+                'partner:id,name',
+                'orderproduct:id,order_id,product_id,quantity,price',
+                'product'])
+            ->get();
+
+
+
+        $result->each(function ($item) {                         //Получаем сумму позиции
+            $item->orderproduct->each(function ($item) {
+                $item['item_sum'] = $item->quantity * $item->price;
+                return $item;
+            });
+        });
+
+        $result->each(function ($item) {                         //Получаем сумму заказа
+            $item['order_sum'] = $item->orderproduct->sum('item_sum');
+        });
+
+        $result->each(function ($item) {                         //Объединяем продукты в строку
+            $item['products'] = $item->product->implode('name', ', ');
+        });
+
+        return $result;
+    }
+
+
+    public function getAllWithPaginate($perPage = NULL)
     {
         $columns = [
             'id',
@@ -39,7 +78,7 @@ class ShopOrderRepository extends CoreRepository
                 'partner:id,name',
                 'orderproduct:id,order_id,product_id,quantity,price',
                 'product'])
-            ->paginate(20);
+            ->paginate($perPage);
 
         $result->getCollection()->each(function ($item) {                         //Получаем сумму позиции
             $item->orderproduct->each(function ($item) {

@@ -13,7 +13,9 @@
 
 Route::get('/', 'Shop\HomePageController@index')->name('homepage');
 
+
 Route::group(['namespace' => 'Shop', 'prefix' => 'shop'], function () {
+    Route::get('showurgentstabs', 'OrderController@showUrgentsTabs');
     Route::resource('orders', 'OrderController')->names('orders')->only(['index', 'edit', 'update']);
     Route::get('products', 'ProductController@index')->name('products');
     Route::post('products/updateprice', 'ProductController@updateprice')->name('updateprice');

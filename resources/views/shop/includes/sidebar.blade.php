@@ -10,13 +10,19 @@
             <li class="nav-item">
                 <a class="nav-link" href="{{ asset('/shop/orders') }}">
                     <span data-feather="file"></span>
-                    Заказы
+                    Все заказы
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ asset('/shop/orders') }}">
+                    <span data-feather="file"></span>
+                    Заказы по вкладкам
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="{{ asset('/shop/products ') }}">
                     <span data-feather="shopping-cart"></span>
-                    ПРодукты
+                    Список продуктов
                 </a>
             </li>
         </ul>
