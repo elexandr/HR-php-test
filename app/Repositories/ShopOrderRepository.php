@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Order as Model;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use mysql_xdevapi\Collection;
 
@@ -41,8 +42,6 @@ class ShopOrderRepository extends CoreRepository
                 'orderproduct:id,order_id,product_id,quantity,price',
                 'product'])
             ->get();
-
-
 
         $result->each(function ($item) {                         //Получаем сумму позиции
             $item->orderproduct->each(function ($item) {
@@ -104,11 +103,75 @@ class ShopOrderRepository extends CoreRepository
      * @return \Illuminate\Database\Eloquent\Collection
      */
 
-    public function getEdit($id)
+    public function getOne($id)
     {
-        return $this->startConditions()
+        $columns = [
+            'id',
+            'status',
+            'client_email',
+            'partner_id',
+        ];
+         $order = $this->startConditions()
             ->with(['partner:id,name', 'orderproduct', 'product'])
             ->find($id);
+
+        return $order;
+    }
+
+    public function getOrderEmails($id)
+    {
+        // Получаем emails клиента и поставщиков товаров по заказу
+        $query = <<<TAG
+            select client_email from orders where id = '$id'
+            union
+            select 
+            distinct
+            vendors.email
+            from vendors
+            inner join products 
+            on products.vendor_id = vendors.id 
+            inner join order_products 
+            on order_products.product_id = products.id
+            inner join orders 
+            on orders.id = order_products.order_id
+            where orders.id = '$id';
+TAG;
+
+        $emails = collect(DB::select($query));
+
+
+        return $emails;
+    }
+
+    public function getOrderProducts($id)
+    {
+         $order = $this->startConditions()
+            ->with(['product'])
+            ->find($id);
+
+         $products = $order->product;
+        return $products;
+    }
+
+    public function getOrderSUm($id){
+        $columns = [
+            'id',
+        ];
+
+        $result = $this->startConditions()
+            ->select($columns)
+            ->with([
+                'orderproduct:order_id,quantity,price',
+                ])
+            ->find($id);
+
+        $sum = 0;
+        foreach ($result->orderproduct as $item) {
+            $sum += $item->quantity * $item->price;
+        }
+
+        return $sum;
+
     }
 
 }

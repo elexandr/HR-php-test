@@ -3,15 +3,18 @@
 namespace App\Http\Controllers\Shop;
 
 use App\Http\Requests\OrderUpdateRequest;
+use App\Mail\OrderCompletedMail;
 use App\Partner;
 use App\Repositories\ShopOrderRepository;
-use Illuminate\Http\Request;
 use App\Order;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class OrderController extends BaseController
 {
 
+    // Локигу получения информации выносим в Репозиторий
     private $shopOrderRepository;
 
     /**
@@ -26,9 +29,9 @@ class OrderController extends BaseController
 
 
     /**
-     * Display a listing of the resource.
+     *  Оборажаем список заказов согласно ТЗ с пагинацией
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index()
     {
@@ -39,14 +42,14 @@ class OrderController extends BaseController
 
 
     /**
-     * Show the form for editing the specified resource.
+     *  Получаем данные и отображаем форму редактирования
      *
      * @param int $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function edit($id)
     {
-        $order = $this->shopOrderRepository->getEdit($id);
+        $order = $this->shopOrderRepository->getOne($id);
 
         $statuses = $this->orderStatuses();
 
@@ -54,11 +57,11 @@ class OrderController extends BaseController
     }
 
     /**
-     * Update the specified resource in storage.
+     *  Обновляем информацию по заказу и в случае завершения инциируем отправку email
      *
      * @param Order $order
      * @param OrderUpdateRequest $request
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function update(Order $order, OrderUpdateRequest $request)
     {
@@ -66,15 +69,44 @@ class OrderController extends BaseController
 
         $partner = Partner::find($order->partner_id);
 
+        // Обновляем данные
         $partnerUpdateResult = $partner->update($data);
         $orderUpdateResult = $order->update($data);
 
+        // ПРоверяем, что изменился статус и если он 20 - инициируем отправку уведомлений
+        $changes = $order->getChanges();
+        if (array_key_exists('status', $changes)) {
+            $changes['status'] == 20 ? $this->orderCompletedNotification($order->id) : '';
+        }
+
+        // Передем в вид информацию, что все успешно
         ($partnerUpdateResult && $orderUpdateResult) ? session()->flash('successOrderUpdate', true) : '';
 
         return redirect()->route('orders.edit', $order->id);
     }
 
-    /** Возвращаем статусы. Вынес так как метод и сами статусы могут измениться
+    /** Управление отправкой нотификаций на email
+     *
+     * @param $id
+     */
+    public function orderCompletedNotification($id)
+    {
+        // Получаем данные для письма
+        $emails = $this->shopOrderRepository->getOrderEmails($id);
+        $products = $this->shopOrderRepository->getOrderProducts($id);
+        $sum = $this->shopOrderRepository->getOrderSUm($id);
+        $subject = "Заказ №'$id' выполнен.";
+
+        // Отсылаем всем получателям через очередь
+        foreach ($emails as $email) {
+            Mail::to($email->client_email)->queue(new OrderCompletedMail($products, $sum, $subject));
+        }
+
+    }
+
+
+    /** Возвращаем статусы. Вынес, так как метод и сами статусы могут измениться
+     *
      * @return array
      */
     public function orderStatuses()
@@ -87,37 +119,41 @@ class OrderController extends BaseController
         return $statuses;
     }
 
+    /** Показываем заказы по вкладкам срочности
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function showUrgentsTabs()
     {
+        // Получаем все заказы
         $orders = $this->shopOrderRepository->getAll();
 
         date_default_timezone_set('Europe/Moscow'); //TODO перенести в настройки
 
-        // Просроченные
+        // Фильтруем по параметрам из ТЗ Просроченные
         $overdueOrders = $orders->filter(function ($item) {
             return $item->delivery_dt < now() && $item->status == 10;
         })->sortByDesc('delivery_dt')->slice(0, 50);
 
-        // Текущие
+        // Фильтруем по параметрам из ТЗ Текущие
         $currentOrders = $orders->filter(function ($item) {
             return $item->delivery_dt > now()
                 && $item->delivery_dt < now()->addHours(24)
                 && $item->status == 10;
         })->sortBy('delivery_dt');
 
-        // Новые
+        // Фильтруем по параметрам из ТЗ Новые
         $newOrders = $orders->filter(function ($item) {
             return $item->delivery_dt > now() && $item->status == 0;
         })->sortBy('delivery_dt')->slice(0, 50);
 
-        // Выполненные
+        // Фильтруем по параметрам из ТЗ Выполненные
         $completedOrders = $orders->filter(function ($item) {
-            return date( "Y-m-d", strtotime( $item->delivery_dt)) == date("Y-m-d")
+            return date("Y-m-d", strtotime($item->delivery_dt)) == date("Y-m-d")
                 && $item->status == 20;
         })->sortByDesc('delivery_dt')->slice(0, 50);
 
         return view('shop.orders.show_urgents_tabs', compact('overdueOrders', 'currentOrders', 'newOrders', 'completedOrders'));
     }
-
 
 }
