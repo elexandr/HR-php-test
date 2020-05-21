@@ -5,17 +5,14 @@ namespace App\Http\Controllers\Shop;
 use App\Http\Requests\ProductUpdateRequest;
 use App\Product;
 use App\Repositories\ShopProductRepository;
-use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Log;
 
 class ProductController extends BaseController
 {
-
+    // Логика получения в репозитории
     private $shopProductRepository;
 
     /**
-     * ProductCotroller conctructor
+     * ProductController constructor
      *
      */
     public function __construct()
@@ -25,23 +22,26 @@ class ProductController extends BaseController
         $this->shopProductRepository = app(ShopProductRepository::class);
     }
 
+    /** Получаем список товаров с пагинацией
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function index()
     {
-        $products = $this->shopProductRepository->getAllWithPaginate();
+        $products = $this->shopProductRepository->getAllWithPaginate(25);
 
         return view('shop.products.index', compact('products'));
     }
 
+    /** Обработчик ajax обновления цены из списка продуктов
+     *
+     * @param ProductUpdateRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function updatePrice(ProductUpdateRequest $request){
-
         $data = $request->validated();
         $res = Product::where('id', $data['id'])->update(['price' => $data['price']]);
-        Log::debug($res);
 
-
-
-        return response()->json(['result' => true]);
-
-
+        return response()->json(['result' => $res]);
     }
 }

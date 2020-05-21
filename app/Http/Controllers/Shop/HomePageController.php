@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers\Shop;
 
-use Illuminate\Http\Request;
-
-
 class HomePageController extends BaseController
 {
+    /** Отображаем главную страницу с температурой в Брянске     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+
     public function index()
     {
         $temp = $this->getWeather();
@@ -19,9 +20,14 @@ class HomePageController extends BaseController
      */
     public function getWeather ()
     {
-        $coordinates = $this->getCoordinates(); //Берем координаты нужного населенного пункта
+        // Проверка на ниличие API Key Яндекса
+        if(!env('API_WEATHER_KEY')){return '';};
 
-        $url = 'https://api.weather.yandex.ru/v1/forecast?extra=true&'.$coordinates; //Формируем нужный url
+        //Берем координаты нужного населенного пункта
+        $coordinates = $this->getCoordinates();
+
+        //Формируем нужный url
+        $url = 'https://api.weather.yandex.ru/v1/forecast?extra=true&'.$coordinates;
 
         $client = new \GuzzleHttp\Client();
 
@@ -31,7 +37,7 @@ class HomePageController extends BaseController
 
         $contents = $response->getBody()->getContents(); //json body
         $result = json_decode($contents, true); //array
-        $temp = ($result['fact']['temp']);
+        $temp = ($result['fact']['temp']); // температура
 
         return $temp;
     }

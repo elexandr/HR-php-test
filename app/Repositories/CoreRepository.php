@@ -4,15 +4,11 @@ namespace App\Repositories;
 
 use Illuminate\Database\Eloquent\Model;
 
-/**
+/** Базовый
+ *
  *  Class CoreRepository
- *
- * @package App\Repositories
- *
- * Репозиторий работы с сущностью
- * Может выдавать наборы данных
- * Не может создавать/изменять сущности
- */
+ * * @package App\Repositories
+  */
 
 abstract class coreRepository
 {

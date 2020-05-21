@@ -4,7 +4,6 @@ namespace App\Repositories;
 
 use App\Product as Model;
 use Illuminate\Pagination\LengthAwarePaginator;
-use mysql_xdevapi\Collection;
 
 /**
  * Class ShopOrderRepository
@@ -24,7 +23,7 @@ class ShopProductRepository extends CoreRepository
     /**
      * @return LengthAwarePaginator
      */
-    public function getAllWithPaginate()
+    public function getAllWithPaginate($perPage = 15)
     {
         $columns = [
             'id',
@@ -37,7 +36,7 @@ class ShopProductRepository extends CoreRepository
             ->select($columns)
             ->orderBy('name', 'ASC')
             ->with(['vendor:id,name'])
-            ->paginate(25);
+            ->paginate($perPage);
 
         return $result;
     }

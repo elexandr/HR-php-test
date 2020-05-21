@@ -32,10 +32,11 @@
                 </tr>
                 </tbody>
             </table>
-
         </div>
+
         <div class="col-md-6 order-md-1">
             <h4 class="mb-3">Информация о заказе № {{ $order->id }}</h4>
+
             @if($errors->any())
                 <div class="border border-danger text-danger mt-2 pt-2">
                     <ul>
@@ -47,14 +48,12 @@
                     </ul>
                 </div>
             @endif
+
             @if(session()->get('successOrderUpdate'))
                 <div class="border border-success mt-2 text-center text-success">
                     Заказ успешно обновлен!
                 </div>
             @endif
-
-
-
 
             <form method="POST" action="{{ route('orders.update', $order->id ) }}" class="needs-validation" novalidate="" _lpchecked="1">
                 {{method_field('PATCH')}}
@@ -68,7 +67,6 @@
                     <label for="client_email">Email <span class="text-muted">(Обязательное поле)</span></label>
                     <input type="email" class="form-control" name="client_email" id="client_email" value="{{ Old('client_email') ?? $order->client_email }}">
                 </div>
-
                 <div class="row">
                     <div class="col-md-4 mb-3">
                         <label for="status">Статус заказа</label>

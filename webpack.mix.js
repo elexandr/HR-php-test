@@ -11,5 +11,18 @@ let mix = require('laravel-mix');
  |
  */
 
-mix.js('resources/assets/js/app.js', 'public/js')
-   .sass('resources/assets/sass/app.scss', 'public/css');
+// Объединяем файлы стилей и js согласно ТЗ
+
+mix.scripts([
+    'resources/assets/js/jquery-3.5.0.min.js',
+    'resources/assets/js/bootstrap.bundle.min.js',
+    'resources/assets/js/feather.min.js',
+    'resources/assets/js/dashboard.js',
+    ], 'public/js/app.js')
+    .scripts([
+        'resources/assets/js/script.js',
+    ], 'public/js/script.js')
+    .styles(['resources/assets/sass/bootstrap.min.css',
+        'resources/assets/sass/dashboard.css',
+    ], 'public/css/app.css')
+    .styles('resources/assets/sass/style.css', 'public/css/style.css');

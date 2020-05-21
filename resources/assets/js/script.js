@@ -1,9 +1,9 @@
+// Обновление цены ajax на странице списка продуктов
 $.ajaxSetup({
     headers: {
         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
     }
 });
-
 function price_update(el) {
     var myEl = $(el);
     var edit_id = myEl.attr('id')

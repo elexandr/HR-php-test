@@ -8,7 +8,6 @@ use App\Partner;
 use App\Repositories\ShopOrderRepository;
 use App\Order;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
 class OrderController extends BaseController
@@ -18,7 +17,7 @@ class OrderController extends BaseController
     private $shopOrderRepository;
 
     /**
-     * OrderCotroller conctructor     *
+     * OrderController constructor     *
      */
     public function __construct()
     {
@@ -29,7 +28,7 @@ class OrderController extends BaseController
 
 
     /**
-     *  Оборажаем список заказов согласно ТЗ с пагинацией
+     *  Оборажаем список заказов согласно обязательной части ТЗ с пагинацией
      *
      * @return Response
      */
@@ -67,6 +66,10 @@ class OrderController extends BaseController
     {
         $data = $request->validated();
 
+        if(empty($data)){
+            abort(404);
+        }
+
         $partner = Partner::find($order->partner_id);
 
         // Обновляем данные
@@ -92,12 +95,16 @@ class OrderController extends BaseController
     public function orderCompletedNotification($id)
     {
         // Получаем данные для письма
+        //Все emails
         $emails = $this->shopOrderRepository->getOrderEmails($id);
+        // Список продуктов
         $products = $this->shopOrderRepository->getOrderProducts($id);
+        // Сумму заказа
         $sum = $this->shopOrderRepository->getOrderSUm($id);
+        // Формируем тему
         $subject = "Заказ №'$id' выполнен.";
 
-        // Отсылаем письма каждому получателю через очередь
+        // Отсылаем письма каждому получателю через очередь и подготовленный шаблон
         foreach ($emails as $email) {
             Mail::to($email->client_email)->queue(new OrderCompletedMail($products, $sum, $subject));
         }
@@ -112,8 +119,6 @@ class OrderController extends BaseController
     {
         // Получаем все заказы
         $orders = $this->shopOrderRepository->getAll();
-
-        date_default_timezone_set('Europe/Moscow'); //TODO перенести в настройки
 
         // Фильтруем по параметрам из ТЗ Просроченные
         $overdueOrders = $orders->filter(function ($item) {

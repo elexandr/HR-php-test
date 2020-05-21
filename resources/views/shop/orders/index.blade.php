@@ -5,7 +5,6 @@
     <h1>Список заказов</h1>
 
     <div class="table-responsive">
-
         <table class="table table-striped table-sm">
             <thead>
             <tr>
@@ -17,7 +16,6 @@
             </tr>
             </thead>
             <tbody>
-
             @foreach($orders as $order)
                 <tr>
                     <td> <a target="_blank" href="{{ route("orders.edit", ['order' => $order->id]) }}">{{ $order->id }}</a></td>
@@ -34,11 +32,8 @@
         @if($orders->total() > $orders->count())
             <br>
             <div class="row justify-content-center">
-
-                            {{ $orders->links("pagination::bootstrap-4") }}
-
+                {{ $orders->links("pagination::bootstrap-4") }}
             </div>
-
         @endif
 
     @stop

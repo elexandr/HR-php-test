@@ -5,8 +5,6 @@ namespace App\Repositories;
 use App\Order as Model;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-use mysql_xdevapi\Collection;
 
 /**
  * Class ShopOrderRepository
@@ -23,7 +21,8 @@ class ShopOrderRepository extends CoreRepository
         return Model::class;
     }
 
-    /**
+    /** Получаем все без пагинации для дальнейшей обработки по вкладкам
+     *
      * @return LengthAwarePaginator
      */
     public function getAll()
@@ -65,12 +64,12 @@ class ShopOrderRepository extends CoreRepository
         return $result;
     }
 
-    /** Получаем все заказы с заданным к-вом пагинации (по умолчанию 0)
+    /** Получаем все заказы с заданным к-вом пагинации (по умолчанию 15)
      *
      * @param null $perPage
      * @return mixed
      */
-    public function getAllWithPaginate($perPage = NULL)
+    public function getAllWithPaginate($perPage = 15)
     {
         $columns = [
             'id',
@@ -109,8 +108,8 @@ class ShopOrderRepository extends CoreRepository
         return $result;
     }
 
-    /**
-     * Получить конкретный заказ
+    /** Получить конкретный заказ
+     *
      * @param $id
      * @return \Illuminate\Database\Eloquent\Collection
      */
@@ -124,11 +123,18 @@ class ShopOrderRepository extends CoreRepository
             'partner_id',
         ];
          $order = $this->startConditions()
-            ->with(['partner:id,name', 'orderproduct', 'product'])
-            ->find($id);
+             ->select($columns)
+             ->with(['partner:id,name', 'orderproduct', 'product'])
+             ->find($id);
 
         return $order;
     }
+
+    /** Получаем список emails заказчика и постащиков товаров из заказа
+     *
+     * @param $id
+     * @return \Illuminate\Support\Collection
+     */
 
     public function getOrderEmails($id)
     {
@@ -155,6 +161,11 @@ TAG;
         return $emails;
     }
 
+    /** Получаем список продуктов из заказа для письма
+     *
+     * @param $id
+     * @return mixed
+     */
     public function getOrderProducts($id)
     {
          $order = $this->startConditions()
@@ -164,6 +175,12 @@ TAG;
          $products = $order->product;
         return $products;
     }
+
+    /** Получаем сумму конкретного заказа для письма
+     *
+     * @param $id
+     * @return float|int
+     */
 
     public function getOrderSUm($id){
         $columns = [
@@ -200,6 +217,11 @@ TAG;
         return $statuses;
     }
 
+    /** Возвращаем текстовое значение статуса
+     *
+     * @param $status
+     * @return mixed
+     */
     public function getTextStatus($status){
         $statuses = $this->getOrderStatuses();
 

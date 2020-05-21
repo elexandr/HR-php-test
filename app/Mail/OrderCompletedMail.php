@@ -5,8 +5,6 @@ namespace App\Mail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use mysql_xdevapi\Collection;
 
 class OrderCompletedMail extends Mailable
 {
@@ -15,8 +13,6 @@ class OrderCompletedMail extends Mailable
     protected $products;
     protected $sum;
     public $subject;
-
-
 
     /**
      * Create a new message instance.
