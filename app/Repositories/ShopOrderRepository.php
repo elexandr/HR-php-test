@@ -43,25 +43,33 @@ class ShopOrderRepository extends CoreRepository
                 'product'])
             ->get();
 
-        $result->each(function ($item) {                         //Получаем сумму позиции
+        //Получаем сумму позиции
+        $result->each(function ($item) {
             $item->orderproduct->each(function ($item) {
                 $item['item_sum'] = $item->quantity * $item->price;
                 return $item;
             });
         });
 
-        $result->each(function ($item) {                         //Получаем сумму заказа
+        //Получаем сумму заказа
+        $result->each(function ($item) {
             $item['order_sum'] = $item->orderproduct->sum('item_sum');
         });
 
-        $result->each(function ($item) {                         //Объединяем продукты в строку
+        //Объединяем продукты в строку и получем статус заказа текстом
+        $result->each(function ($item) {
             $item['products'] = $item->product->implode('name', ', ');
+            $item['text_status'] = $this->getTextStatus($item->status);
         });
 
         return $result;
     }
 
-
+    /** Получаем все заказы с заданным к-вом пагинации (по умолчанию 0)
+     *
+     * @param null $perPage
+     * @return mixed
+     */
     public function getAllWithPaginate($perPage = NULL)
     {
         $columns = [
@@ -79,26 +87,30 @@ class ShopOrderRepository extends CoreRepository
                 'product'])
             ->paginate($perPage);
 
-        $result->getCollection()->each(function ($item) {                         //Получаем сумму позиции
+        //Получаем сумму позиции
+        $result->getCollection()->each(function ($item) {
             $item->orderproduct->each(function ($item) {
                 $item['item_sum'] = $item->quantity * $item->price;
                 return $item;
             });
         });
 
-        $result->getCollection()->each(function ($item) {                         //Получаем сумму заказа
+        //Получаем сумму заказа
+        $result->getCollection()->each(function ($item) {
             $item['order_sum'] = $item->orderproduct->sum('item_sum');
         });
 
-        $result->getCollection()->each(function ($item) {                         //Объединяем продукты в строку
+        //Объединяем продукты в строку и получем статус заказа текстом
+        $result->getCollection()->each(function ($item) {
             $item['products'] = $item->product->implode('name', ', ');
+            $item['text_status'] = $this->getTextStatus($item->status);
         });
 
         return $result;
     }
 
     /**
-     * Получить модeль для редкатирования
+     * Получить конкретный заказ
      * @param $id
      * @return \Illuminate\Database\Eloquent\Collection
      */
@@ -172,6 +184,26 @@ TAG;
 
         return $sum;
 
+    }
+
+    /** Возвращаем статусы. Вынес в репозиторий, так как сами статусы могут стать редактируемыми и храниться в бд
+     *
+     * @return array
+     */
+    public function getOrderStatuses()
+    {
+        $statuses = [
+            0 => 'Новый',
+            10 => 'Подтвержден',
+            20 => 'Завершен',
+        ];
+        return $statuses;
+    }
+
+    public function getTextStatus($status){
+        $statuses = $this->getOrderStatuses();
+
+        return $statuses[$status];
     }
 
 }

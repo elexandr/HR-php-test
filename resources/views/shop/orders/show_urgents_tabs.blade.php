@@ -3,8 +3,6 @@
 @section('content')
 
     <h1>Список заказов по срочности</h1>
-    {{--$overdueOrdes $currentOrdes $newOrdes $completedOrdes--}}
-    {{-- overdue-orders', 'current-orders', 'new-orders', 'completed-orders--}}
 
     <nav>
         <div class="nav nav-tabs" id="nav-tab" role="tablist">
@@ -19,14 +17,14 @@
             <div class="table-responsive">
                 <table class="table table-striped table-sm">
                     <thead>
-                        <tr class="no-border-top">
-                            <th>ID</th>
-                            <th>Партнер</th>
-                            <th>Стоимость</th>
-                            <th>Состав</th>
-                            <th>Доставка</th>
-                            <th>Статус</th>
-                        </tr>
+                    <tr class="no-border-top">
+                        <th>ID</th>
+                        <th>Партнер</th>
+                        <th>Стоимость</th>
+                        <th>Состав</th>
+                        <th>Доставка</th>
+                        <th>Статус</th>
+                    </tr>
                     </thead>
                     <tbody>
 
@@ -37,7 +35,7 @@
                             <td>{{ $overdueOrder->order_sum }}</td>
                             <td>{{ $overdueOrder->products }}</td>
                             <td>{{ $overdueOrder->delivery_dt }}</td>
-                            <td>{{ $overdueOrder->status }}</td>
+                            <td>{{ $overdueOrder->text_status }}</td>
                         </tr>
                     @endforeach
                     </tbody>
@@ -46,98 +44,94 @@
         </div>
 
         <div class="tab-pane fade" id="current-orders" role="tabpanel" aria-labelledby="nav-home-tab">
-                <div class="table-responsive">
-                    <table class="table table-striped table-sm">
-                        <thead>
-                        <tr class="no-border-top">
-                            <th>ID</th>
-                            <th>Партнер</th>
-                            <th>Стоимость</th>
-                            <th>Состав</th>
-                            <th>Доставка</th>
-                            <th>Статус</th>
-                        </tr>
-                        </thead>
-                        <tbody>
+            <div class="table-responsive">
+                <table class="table table-striped table-sm">
+                    <thead>
+                    <tr class="no-border-top">
+                        <th>ID</th>
+                        <th>Партнер</th>
+                        <th>Стоимость</th>
+                        <th>Состав</th>
+                        <th>Доставка</th>
+                        <th>Статус</th>
+                    </tr>
+                    </thead>
+                    <tbody>
 
-                        @foreach($currentOrders as $currentOrder)
-                            <tr>
-                                <td> <a target="_blank" href="{{ route("orders.edit", ['order' => $currentOrder->id]) }}">{{ $currentOrder->id }}</a></td>
-                                <td>{{ $currentOrder->partner->name }}</td>
-                                <td>{{ $currentOrder->order_sum }}</td>
-                                <td>{{ $currentOrder->products }}</td>
-                                <td>{{ $currentOrder->delivery_dt }}</td>
-                                <td>{{ $currentOrder->status }}</td>
-                            </tr>
-                        @endforeach
-                        </tbody>
-                    </table>
-                </div>
+                    @foreach($currentOrders as $currentOrder)
+                        <tr>
+                            <td> <a target="_blank" href="{{ route("orders.edit", ['order' => $currentOrder->id]) }}">{{ $currentOrder->id }}</a></td>
+                            <td>{{ $currentOrder->partner->name }}</td>
+                            <td>{{ $currentOrder->order_sum }}</td>
+                            <td>{{ $currentOrder->products }}</td>
+                            <td>{{ $currentOrder->delivery_dt }}</td>
+                            <td>{{ $currentOrder->text_status }}</td>
+                        </tr>
+                    @endforeach
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <div class="tab-pane fade" id="new-orders" role="tabpanel" aria-labelledby="nav-home-tab">
-                <div class="table-responsive">
-                    <table class="table table-striped table-sm">
-                        <thead>
-                        <tr class="no-border-top">
-                            <th>ID</th>
-                            <th>Партнер</th>
-                            <th>Стоимость</th>
-                            <th>Состав</th>
-                            <th>Доставка</th>
-                            <th>Статус</th>
-                        </tr>
-                        </thead>
-                        <tbody>
+            <div class="table-responsive">
+                <table class="table table-striped table-sm">
+                    <thead>
+                    <tr class="no-border-top">
+                        <th>ID</th>
+                        <th>Партнер</th>
+                        <th>Стоимость</th>
+                        <th>Состав</th>
+                        <th>Доставка</th>
+                        <th>Статус</th>
+                    </tr>
+                    </thead>
+                    <tbody>
 
-                        @foreach($newOrders as $newOrder)
-                            <tr>
-                                <td> <a target="_blank" href="{{ route("orders.edit", ['order' => $newOrder->id]) }}">{{ $newOrder->id }}</a></td>
-                                <td>{{ $newOrder->partner->name }}</td>
-                                <td>{{ $newOrder->order_sum }}</td>
-                                <td>{{ $newOrder->products }}</td>
-                                <td>{{ $newOrder->delivery_dt }}</td>
-                                <td>{{ $newOrder->status }}</td>
-                            </tr>
-                        @endforeach
-                        </tbody>
-                    </table>
-                </div>
+                    @foreach($newOrders as $newOrder)
+                        <tr>
+                            <td> <a target="_blank" href="{{ route("orders.edit", ['order' => $newOrder->id]) }}">{{ $newOrder->id }}</a></td>
+                            <td>{{ $newOrder->partner->name }}</td>
+                            <td>{{ $newOrder->order_sum }}</td>
+                            <td>{{ $newOrder->products }}</td>
+                            <td>{{ $newOrder->delivery_dt }}</td>
+                            <td>{{ $newOrder->text_status }}</td>
+                        </tr>
+                    @endforeach
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <div class="tab-pane fade" id="completed-orders" role="tabpanel" aria-labelledby="nav-home-tab">
-                <div class="table-responsive">
-                    <table class="table table-striped table-sm">
-                        <thead>
-                        <tr class="no-border-top">
-                            <th>ID</th>
-                            <th>Партнер</th>
-                            <th>Стоимость</th>
-                            <th>Состав</th>
-                            <th>Доставка</th>
-                            <th>Статус</th>
-                        </tr>
-                        </thead>
-                        <tbody>
+            <div class="table-responsive">
+                <table class="table table-striped table-sm">
+                    <thead>
+                    <tr class="no-border-top">
+                        <th>ID</th>
+                        <th>Партнер</th>
+                        <th>Стоимость</th>
+                        <th>Состав</th>
+                        <th>Доставка</th>
+                        <th>Статус</th>
+                    </tr>
+                    </thead>
+                    <tbody>
 
-                        @foreach($completedOrders as $completedOrder)
-                            <tr>
-                                <td> <a target="_blank" href="{{ route("orders.edit", ['order' => $completedOrder->id]) }}">{{ $completedOrder->id }}</a></td>
-                                <td>{{ $completedOrder->partner->name }}</td>
-                                <td>{{ $completedOrder->order_sum }}</td>
-                                <td>{{ $completedOrder->products }}</td>
-                                <td>{{ $completedOrder->delivery_dt }}</td>
-                                <td>{{ $completedOrder->status }}</td>
-                            </tr>
-                        @endforeach
-                        </tbody>
-                    </table>
-                </div>
+                    @foreach($completedOrders as $completedOrder)
+                        <tr>
+                            <td> <a target="_blank" href="{{ route("orders.edit", ['order' => $completedOrder->id]) }}">{{ $completedOrder->id }}</a></td>
+                            <td>{{ $completedOrder->partner->name }}</td>
+                            <td>{{ $completedOrder->order_sum }}</td>
+                            <td>{{ $completedOrder->products }}</td>
+                            <td>{{ $completedOrder->delivery_dt }}</td>
+                            <td>{{ $completedOrder->text_status }}</td>
+                        </tr>
+                    @endforeach
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
-
-
-
-
 
 @stop

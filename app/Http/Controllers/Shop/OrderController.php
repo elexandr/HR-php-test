@@ -51,7 +51,7 @@ class OrderController extends BaseController
     {
         $order = $this->shopOrderRepository->getOne($id);
 
-        $statuses = $this->orderStatuses();
+        $statuses = $this->shopOrderRepository->getOrderStatuses();
 
         return view('shop.orders.edit', compact('order', 'statuses'));
     }
@@ -97,27 +97,12 @@ class OrderController extends BaseController
         $sum = $this->shopOrderRepository->getOrderSUm($id);
         $subject = "Заказ №'$id' выполнен.";
 
-        // Отсылаем всем получателям через очередь
+        // Отсылаем письма каждому получателю через очередь
         foreach ($emails as $email) {
             Mail::to($email->client_email)->queue(new OrderCompletedMail($products, $sum, $subject));
         }
-
     }
 
-
-    /** Возвращаем статусы. Вынес, так как метод и сами статусы могут измениться
-     *
-     * @return array
-     */
-    public function orderStatuses()
-    {
-        $statuses = [
-            0 => 'Новый',
-            10 => 'Подтвержден',
-            20 => 'Завершен',
-        ];
-        return $statuses;
-    }
 
     /** Показываем заказы по вкладкам срочности
      *

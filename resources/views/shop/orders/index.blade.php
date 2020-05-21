@@ -11,7 +11,7 @@
             <tr>
                 <th>ID</th>
                 <th>Партнер</th>
-                <th>Стоимость</th>
+                <th class="text-center">Стоимость</th>
                 <th>Состав</th>
                 <th>Статус</th>
             </tr>
@@ -22,9 +22,9 @@
                 <tr>
                     <td> <a target="_blank" href="{{ route("orders.edit", ['order' => $order->id]) }}">{{ $order->id }}</a></td>
                     <td>{{ $order->partner->name }}</td>
-                    <td>{{ $order->order_sum }}</td>
+                    <td class="text-center">{{ $order->order_sum }}</td>
                     <td>{{ $order->products }}</td>
-                    <td>{{ $order->status }}</td>
+                    <td>{{ $order->text_status }}</td>
                 </tr>
             @endforeach
             </tbody>
