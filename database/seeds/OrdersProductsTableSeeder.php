@@ -1,8 +1,8 @@
 <?php
 
 use Illuminate\Database\Seeder;
-use App\Product;
-use App\Order;
+use App\Models\Product;
+use App\Models\Order;
 
 class OrdersProductsTableSeeder extends Seeder
 {
