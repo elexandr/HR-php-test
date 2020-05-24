@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Shop;
 
+use App\Events\onCompletedOrder;
 use App\Http\Requests\OrderUpdateRequest;
 use App\Mail\OrderCompletedMail;
 use App\Models\Partner;
@@ -9,6 +10,7 @@ use App\Repositories\ShopOrderRepository;
 use App\Models\Order;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Event;
 
 class OrderController extends BaseController
 {
@@ -76,39 +78,13 @@ class OrderController extends BaseController
         $partnerUpdateResult = $partner->update($data);
         $orderUpdateResult = $order->update($data);
 
-        // ПРоверяем, что изменился статус и если он 20 - инициируем отправку уведомлений
-        $changes = $order->getChanges();
-        if (array_key_exists('status', $changes)) {
-            $changes['status'] == 20 ? $this->orderCompletedNotification($order->id) : '';
-        }
-
         // Передем в вид информацию, что все успешно
         ($partnerUpdateResult && $orderUpdateResult) ? session()->flash('successOrderUpdate', true) : '';
 
         return redirect()->route('orders.edit', $order->id);
     }
 
-    /** Управление отправкой нотификаций на email
-     *
-     * @param $id
-     */
-    public function orderCompletedNotification($id)
-    {
-        // Получаем данные для письма
-        //Все emails
-        $emails = $this->shopOrderRepository->getOrderEmails($id);
-        // Список продуктов
-        $products = $this->shopOrderRepository->getOrderProducts($id);
-        // Сумму заказа
-        $sum = $this->shopOrderRepository->getOrderSUm($id);
-        // Формируем тему
-        $subject = "Заказ №'$id' выполнен.";
 
-        // Отсылаем письма каждому получателю через очередь и подготовленный шаблон
-        foreach ($emails as $email) {
-            Mail::to($email->client_email)->queue(new OrderCompletedMail($products, $sum, $subject));
-        }
-    }
 
 
     /** Показываем заказы по вкладкам срочности
