@@ -4,9 +4,9 @@ namespace App\Http\Controllers\Shop;
 
 use App\Http\Requests\OrderUpdateRequest;
 use App\Mail\OrderCompletedMail;
-use App\Partner;
+use App\Models\Partner;
 use App\Repositories\ShopOrderRepository;
-use App\Order;
+use App\Models\Order;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Mail;
 
