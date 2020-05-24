@@ -2,7 +2,7 @@
 
 namespace App\Repositories;
 
-use App\Order as Model;
+use App\Models\Order as Model;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 
@@ -200,7 +200,6 @@ TAG;
         }
 
         return $sum;
-
     }
 
     /** Возвращаем статусы. Вынес в репозиторий, так как сами статусы могут стать редактируемыми и храниться в бд
